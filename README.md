@@ -6,6 +6,8 @@ You can use docker or using systemd start
 
 for start from docker you need start container
 
+Copy config.example.yml to config.yml and set on him credential
+
 ``` docker compose up -d```
 
 or build app 
