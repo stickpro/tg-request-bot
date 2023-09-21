@@ -5,9 +5,13 @@ import "github.com/ilyakaznacheev/cleanenv"
 type (
 	Config struct {
 		Telegram TelegramBot `yaml:"telegram_bot"`
+		Service  Service1c   `yaml:"service"`
 	}
 	TelegramBot struct {
 		BotToken string `yaml:"bot_token"`
+	}
+	Service1c struct {
+		Url string `yaml:"url"`
 	}
 )
 

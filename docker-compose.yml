@@ -3,7 +3,7 @@ version: '3.5'
 services:
   go-tgbot:
     image: go-tgbot
-    container_name: vpn-wg
+    container_name: go-tgbot
     build:
       context: .
       dockerfile: Dockerfile

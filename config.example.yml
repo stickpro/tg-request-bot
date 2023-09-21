@@ -1,2 +1,5 @@
 telegram_bot:
   bot_token: "BOT TOKEN"
+
+service:
+  url: "http://localhost/"

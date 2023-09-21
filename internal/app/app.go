@@ -1,10 +1,13 @@
 package app
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go-tgbot/internal/config"
 	"log"
+	"net/http"
 	"regexp"
 	"strconv"
 	"time"
@@ -77,8 +80,12 @@ func Run() {
 					Date:     formattedDate,
 					Text:     text,
 				}
-
-				msg.Text = task.Text + " " + task.Date
+				err = sendService(&task, cfg.Service.Url)
+				if err == nil {
+					msg.Text = "Task sent successfully"
+				} else {
+					msg.Text = "Failed to send task"
+				}
 			} else {
 				msg.Text = "Invalid input format"
 			}
@@ -92,5 +99,28 @@ func Run() {
 		if _, err := bot.Send(msg); err != nil {
 			log.Panic(err)
 		}
+	}
+}
+
+func sendService(task *Task, url string) error {
+	jsonData, err := json.Marshal(task)
+	if err != nil {
+		fmt.Println("Error marshaling JSON:", err)
+		return err
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("Error sending POST request:", err)
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		fmt.Println("Task data sent successfully.")
+		return nil
+	} else {
+		fmt.Println("Failed to send task data. Status code:", resp.StatusCode)
+		return fmt.Errorf("Failed to send task data. Status code: %d", resp.StatusCode)
 	}
 }
