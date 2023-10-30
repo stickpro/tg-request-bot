@@ -11,7 +11,9 @@ type (
 		BotToken string `yaml:"bot_token"`
 	}
 	Service1c struct {
-		Url string `yaml:"url"`
+		Url      string `yaml:"url"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
 	}
 )
 

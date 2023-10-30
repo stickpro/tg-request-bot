@@ -3,3 +3,5 @@ telegram_bot:
 
 service:
   url: "http://localhost/"
+  username: "userName"
+  password: "password"

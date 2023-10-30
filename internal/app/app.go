@@ -80,7 +80,7 @@ func Run() {
 					Date:     formattedDate,
 					Text:     text,
 				}
-				err = sendService(&task, cfg.Service.Url)
+				err = sendService(&task, cfg.Service.Url, cfg.Service.Username, cfg.Service.Password)
 				if err == nil {
 					msg.Text = "Task sent successfully"
 				} else {
@@ -102,14 +102,24 @@ func Run() {
 	}
 }
 
-func sendService(task *Task, url string) error {
+func sendService(task *Task, url string, username, password string) error {
+	client := &http.Client{}
 	jsonData, err := json.Marshal(task)
 	if err != nil {
 		fmt.Println("Error marshaling JSON:", err)
 		return err
 	}
 
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(username, password)
+
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error sending POST request:", err)
 		return err
