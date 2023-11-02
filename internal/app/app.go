@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -46,20 +47,12 @@ func Run() {
 			continue
 		}
 
-		if !update.Message.IsCommand() { // ignore any non-command Messages
-			continue
-		}
-
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 
-		// Extract the command from the Message.
-		switch update.Message.Command() {
-		case "help":
-			msg.Text = "I understand /task"
-		case "task":
+		if strings.HasPrefix(update.Message.Text, "#task") {
 			log.Printf("[%s] %s", update.Message, update.Message.Text)
 
-			pattern := regexp.MustCompile(`/task\s+@(\S+)\s+(\S+)\s+(.+)$`)
+			pattern := regexp.MustCompile(`#task\s+@(\S+)\s+(\S+)\s+(.+)$`)
 			matches := pattern.FindStringSubmatch(update.Message.Text)
 
 			if len(matches) == 4 {
@@ -82,23 +75,19 @@ func Run() {
 				}
 				err = sendService(&task, cfg.Service.Url, cfg.Service.Username, cfg.Service.Password)
 				if err == nil {
-					msg.Text = "Task sent successfully"
+					msg.Text = "Задача добавлена успешно"
 				} else {
-					msg.Text = "Failed to send task"
+					msg.Text = "Ошибка отправки"
 				}
 			} else {
-				msg.Text = "Invalid input format"
+				msg.Text = "Не верный формат сообщения"
 			}
 
-		case "status":
-			msg.Text = "I'm ok."
-		default:
-			msg.Text = "I don't know that command"
+			if _, err := bot.Send(msg); err != nil {
+				log.Panic(err)
+			}
 		}
 
-		if _, err := bot.Send(msg); err != nil {
-			log.Panic(err)
-		}
 	}
 }
 
